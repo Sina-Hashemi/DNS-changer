@@ -2,11 +2,11 @@
 
 # Check if an argument is provided
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 <dns_name>"
-    exit 1
+    read -p "Enter DNS name: " name
+else
+    name=$1
 fi
 
-name=$1
 
 dnses=( "empty:empty"
         "electro:78.157.42.101 78.157.42.100"
