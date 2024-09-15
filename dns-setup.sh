@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Path to the text configuration file
+CONFIG_FILE="/usr/local/etc/dns_settings.txt"
+
 # Function to display help message
 show_help() {
     echo "Usage: $0 [OPTION] <dns_name>"
@@ -9,19 +12,10 @@ show_help() {
     echo "  -h, --help    Display this help message and exit"
     echo
     echo "Available DNS options:"
-    for dns in "${dnses[@]}"; do
-        KEY="${dns%%:*}"
-        echo "  $KEY"
-    done
+    awk '{print $1}' "$CONFIG_FILE"
     echo
     echo "Example: $0 electro"
 }
-
-# DNS options
-dnses=( "empty:empty"
-        "electro:78.157.42.101 78.157.42.100"
-        "403:10.202.10.202 10.202.10.102"
-)
 
 # Check for help option
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
@@ -31,20 +25,21 @@ fi
 
 # Check if an argument is provided
 if [ $# -eq 0 ]; then
-    read -p "Enter DNS name: " name
-else
-    name=$1
+    echo "Error: Missing DNS name."
+    echo "Use '$0 --help' for more information."
+    exit 1
 fi
 
-for dns in "${dnses[@]}"; do
-    KEY="${dns%%:*}"
-    VALUE="${dns##*:}"
-    if [ "$name" == "$KEY" ]; then
-        networksetup -setdnsservers Wi-Fi $VALUE
+name=$1
+
+# Read DNS settings from text file and set DNS
+if dns_servers=$(awk -v name="$name" '$1 == name {$1=""; print $0}' "$CONFIG_FILE"); then
+    if [ -n "$dns_servers" ]; then
+        networksetup -setdnsservers Wi-Fi $dns_servers
         echo "DNS set to $name"
         exit 0
     fi
-done
+fi
 
 echo "Invalid DNS name. Use '$0 --help' to see available options."
 exit 1

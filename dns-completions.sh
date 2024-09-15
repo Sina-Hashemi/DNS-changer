@@ -6,7 +6,11 @@ _setdns_completions()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="empty electro 403 --help -h"
+
+    # Read DNS names from text file
+    CONFIG_FILE="/usr/local/etc/dns_settings.txt"
+    opts=$(awk '{print $1}' $CONFIG_FILE)
+    opts+=" --help -h"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "--help -h" -- ${cur}) )
