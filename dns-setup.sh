@@ -25,9 +25,7 @@ fi
 
 # Check if an argument is provided
 if [ $# -eq 0 ]; then
-    echo "Error: Missing DNS name."
-    echo "Use '$0 --help' for more information."
-    exit 1
+    read -p "Enter DNS name: " name
 fi
 
 name=$1
